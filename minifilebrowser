@@ -1,0 +1,65 @@
+package minifilebrowser;
+
+import javax.swing.JOptionPane;
+import java.io.File;
+
+public class MiniFileBrowser {
+
+    public static void main(String[] args) {
+        File currentDirectory = new File(System.getProperty("user.dir")); // Começa no diretório atual
+
+        while (true) {
+            StringBuilder content = new StringBuilder();
+            content.append("Diretório atual: ").append(currentDirectory.getAbsolutePath()).append("\n\n");
+
+            String[] items = currentDirectory.list();
+            if (items != null) {
+                for (String item : items) {
+                    File file = new File(currentDirectory, item);
+                    content.append(file.isDirectory() ? "[DIR] " : "[ARQ] ");
+                    content.append(item).append("\n");
+                }
+            } else {
+                content.append("Não foi possível listar o conteúdo.\n");
+            }
+
+            String[] options = {"Listar Conteúdo", "Entrar em Subdiretório", "Voltar ao Diretório Pai", "Sair"};
+            int choice = JOptionPane.showOptionDialog(
+                    null,
+                    content.toString() + "\nO que você deseja fazer?",
+                    "Mini Navegador de Arquivos",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            if (choice == 0) {
+                // Apenas reexibe o conteúdo (o loop já faz isso)
+
+            } else if (choice == 1) {
+                String subdirName = JOptionPane.showInputDialog("Digite o nome do subdiretório que deseja entrar:");
+                if (subdirName != null) {
+                    File nextDir = new File(currentDirectory, subdirName);
+                    if (nextDir.exists() && nextDir.isDirectory()) {
+                        currentDirectory = nextDir;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Erro: Subdiretório inválido ou inexistente.");
+                    }
+                }
+
+            } else if (choice == 2) {
+                File parent = currentDirectory.getParentFile();
+                if (parent != null) {
+                    currentDirectory = parent;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Você já está no diretório raiz. Não é possível voltar mais.");
+                }
+
+            } else if (choice == 3 || choice == JOptionPane.CLOSED_OPTION) {
+                break;
+            }
+        }
+    }
+}
